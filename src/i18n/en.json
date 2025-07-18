@@ -1,5 +1,24 @@
 {
   "welcome": {
-    "title": "Never forget\nyour <highlight>games</highlight>\ never again"
+    "title": "Never forget\nyour <highlight>games</highlight>\never again"
+  },
+  "signIn": {
+    "title": "Hey,\nWelcome\nback!",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "signIn": "Sign in",
+    "noAccount": "Don't have an account yet?",
+    "signUp": "Sign up"
+  },
+  "signUp": {
+    "title": "Let's get\nstarted!",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "signUp": "Sign up",
+    "hasAccount": "Already have an account?",
+    "signIn": "Sign in"
   }
 }

@@ -1,24 +1,25 @@
-// components/Icon.tsx
 import React from "react";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-type MaterialIconName = React.ComponentProps<typeof MaterialIcons>["name"];
+type MaterialIconName = React.ComponentProps<
+  typeof MaterialCommunityIcons
+>["name"];
 
 interface IconProps {
   name: MaterialIconName;
   size?: number;
   color?: string;
-  style?: React.ComponentProps<typeof MaterialIcons>["style"];
+  style?: React.ComponentProps<typeof MaterialCommunityIcons>["style"];
 }
 
 const Icon: React.FC<IconProps> = ({
   name,
   size = 24,
   color = "black",
-  style,
+  style = "",
   ...props
 }) => (
-  <MaterialIcons
+  <MaterialCommunityIcons
     name={name}
     size={size}
     color={color}
