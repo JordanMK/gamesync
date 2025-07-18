@@ -1,4 +1,4 @@
-import { createStaticNavigation } from "@react-navigation/native";
+import { createStaticNavigation, StaticParamList } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
@@ -36,5 +36,13 @@ const RootNavigator = createNativeStackNavigator({
 });
 
 const Navigation = createStaticNavigation(RootNavigator);
+
+type RootNavigatorParamList = StaticParamList<typeof RootNavigator>;
+
+declare global {
+  namespace ReactNavigation {
+    interface RootParamList extends RootNavigatorParamList {}
+  }
+}
 
 export default Navigation;
