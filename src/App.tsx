@@ -5,6 +5,7 @@ import { useCustomFonts } from "./hooks/useCustomFonts";
 import { useEffect } from "react";
 import { useAppTheme } from "./hooks/useAppTheme";
 import { DefaultTheme } from "@react-navigation/native";
+import "./i18n";
 
 SplashScreen.preventAutoHideAsync();
 

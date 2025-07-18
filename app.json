@@ -28,7 +28,13 @@
       "favicon": "./src/assets/favicon.png"
     },
     "plugins": [
-      "expo-font"
+      "expo-font",
+      [
+        "expo-localization",
+        {
+          "supportedLocales": ["en", "nl", "fr"]
+        }
+      ]
     ],
     "extra": {
       "eas": {

@@ -1,25 +1,27 @@
-import { Image, StyleSheet, TouchableOpacity, View } from "react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Title } from "../../components/Title";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import Icon from "../../components/Icon";
 import { useNavigation } from "@react-navigation/native";
+import { Trans } from "react-i18next";
 
 const WelcomeScreen = () => {
   const { colors } = useAppTheme();
   const navigation = useNavigation();
-  const { container, concatText, image, bottom, dotRow, dot, lastDot, button } =
-    styles;
+  const { container, image, bottom, dotRow, dot, lastDot, button } = styles;
 
   return (
     <SafeAreaView style={container}>
       <View>
-        <Title>Never forget</Title>
-        <View style={concatText}>
-          <Title>your </Title>
-          <Title style={{ color: colors.primary }}>games</Title>
-        </View>
-        <Title>ever again</Title>
+        <Title>
+          <Trans
+            i18nKey="welcome.title"
+            components={{
+              highlight: <Text style={{ color: colors.primary }} />,
+            }}
+          />
+        </Title>
       </View>
       <Image
         source={require("../../assets/welcome.png")}
@@ -51,9 +53,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 32,
     justifyContent: "space-between",
     marginVertical: "12%",
-  },
-  concatText: {
-    flexDirection: "row",
   },
   image: {
     alignSelf: "center",
