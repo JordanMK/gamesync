@@ -3,11 +3,25 @@ import Navigation from "./navigation";
 import * as SplashScreen from "expo-splash-screen";
 import { useCustomFonts } from "./hooks/useCustomFonts";
 import { useEffect } from "react";
+import { useAppTheme } from "./hooks/useAppTheme";
+import { DefaultTheme } from "@react-navigation/native";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const fontsloaded = useCustomFonts();
+  const { colors } = useAppTheme();
+
+  const navTheme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      background: colors.background,
+      text: colors.text,
+      card: colors.card,
+      border: colors.border,
+    },
+  };
 
   useEffect(() => {
     if (fontsloaded) {
@@ -21,7 +35,7 @@ export default function App() {
 
   return (
     <SafeAreaProvider>
-      <Navigation />
+      <Navigation theme={navTheme} />
     </SafeAreaProvider>
   );
 }
