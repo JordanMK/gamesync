@@ -7,6 +7,10 @@ import Button from "../../components/Button";
 import { Trans, useTranslation } from "react-i18next";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useNavigation } from "@react-navigation/native";
+import { useSignIn } from "../../queries/useAuth";
+import { useState } from "react";
+import { signInSchema } from "../../types/authSchema";
+import z from "zod";
 
 const SignInScreen = () => {
   const { colors } = useAppTheme();
@@ -20,6 +24,25 @@ const SignInScreen = () => {
     signUp,
   } = styles;
   const { t } = useTranslation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { mutate, isPending, error } = useSignIn();
+  const [validationErrors, setValidationErrors] = useState<{
+    email?: string[];
+    password?: string[];
+  }>({});
+
+  const handleSignIn = () => {
+    const result = signInSchema.safeParse({ email, password });
+
+    if (!result.success) {
+      const fieldErrors = z.flattenError(result.error).fieldErrors;
+      setValidationErrors(fieldErrors);
+      return;
+    }
+    setValidationErrors({});
+    mutate(result.data);
+  };
 
   return (
     <SafeAreaView style={container}>
@@ -36,10 +59,15 @@ const SignInScreen = () => {
           <TextInput
             leadingIcon={<Icon name="email-outline" />}
             placeholder={t("signIn.email")}
+            onChangeText={setEmail}
+            error={validationErrors.email?.[0]}
           />
           <TextInput
             leadingIcon={<Icon name="lock-outline" />}
             placeholder={t("signIn.password")}
+            secureTextEntry
+            onChangeText={setPassword}
+            error={validationErrors.password?.[0]}
           />
         </View>
         <TouchableOpacity>
@@ -48,9 +76,9 @@ const SignInScreen = () => {
           </Text>
         </TouchableOpacity>
         <Button
-          label={t("signIn.signIn")}
+          label={isPending ? t("signIn.loading") : t("signIn.signIn")}
           containerStyle={button}
-          onPress={() => navigation.navigate("MainNavigator")}
+          onPress={handleSignIn}
         />
 
         <View style={noAccountContainer}>

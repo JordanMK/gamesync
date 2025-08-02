@@ -9,7 +9,8 @@
     "forgotPassword": "Forgot password?",
     "signIn": "Sign in",
     "noAccount": "Don't have an account yet?",
-    "signUp": "Sign up"
+    "signUp": "Sign up",
+    "loading": "Loading..."
   },
   "signUp": {
     "title": "Let's get\nstarted!",
@@ -20,5 +21,23 @@
     "signUp": "Sign up",
     "hasAccount": "Already have an account?",
     "signIn": "Sign in"
+  },
+  "validation": {
+    "username": {
+      "required": "Username is required",
+      "exists": "This username already exists"
+    },
+    "email": {
+      "required": "Email is required",
+      "invalid": "Invalid email"
+    },
+    "password": {
+      "required": "Password is required",
+      "min": "Password must be at least <min> characters"
+    },
+    "confirmPassword": {
+      "required": "Confirm password is required",
+      "notMatch": "Passwords do not match"
+    }
   }
 }

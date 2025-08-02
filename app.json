@@ -32,9 +32,14 @@
       [
         "expo-localization",
         {
-          "supportedLocales": ["en", "nl", "fr"]
+          "supportedLocales": [
+            "en",
+            "nl",
+            "fr"
+          ]
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {
