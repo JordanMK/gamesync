@@ -1,26 +1,39 @@
 import { z } from "zod";
-import i18next from "i18next";
 
 export const signInSchema = z.object({
-  email: z.email(i18next.t("signIn.email")).nonempty(i18next.t("signIn.email")),
-  password: z.string().nonempty().min(6),
+  email: z.email("Please enter a valid email address"),
+  password: z
+    .string()
+    .min(1, "Please enter a valid password")
+    .min(6, "Password must be at least 6 characters"),
 });
 
-export const signUpSchema = z.object({
-  username: z.string().nonempty(),
-  email: z.email().nonempty(),
-  password: z.string().nonempty().min(6),
-  confirmPassword: z.string().nonempty().min(6),
-});
+export const signUpSchema = z
+  .object({
+    username: z
+      .string()
+      .min(1, "Please enter a valid username")
+      .min(3, "Username must be at least 3 characters"),
+    email: z.email("Please enter a valid email address"),
+    password: z
+      .string()
+      .min(1, "Please enter a valid password")
+      .min(6, "Password must be at least 6 characters"),
+    confirmPassword: z.string().min(1, "Please confirm your password"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
 
 export const signInResponseSchema = z.object({
-  jwt: z.string(),
+  jwt: z.jwt(),
 });
 
 export const signUpResponseSchema = z.object({
   username: z.string(),
   email: z.email(),
-  createdAt: z.date(),
+  createdAt: z.string(),
 });
 
 export type SignIn = z.infer<typeof signInSchema>;
