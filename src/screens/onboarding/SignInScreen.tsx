@@ -1,7 +1,6 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Title } from "../../components/Title";
-import Icon from "../../components/Icon";
 import TextInput from "../../components/TextInput";
 import Button from "../../components/Button";
 import { Trans, useTranslation } from "react-i18next";
@@ -11,6 +10,7 @@ import { useSignIn } from "../../queries/useAuth";
 import { useState } from "react";
 import { signInSchema } from "../../types/authSchema";
 import z from "zod";
+import PasswordInput from "../../components/PasswordInput";
 
 const SignInScreen = () => {
   const { colors } = useAppTheme();
@@ -26,22 +26,23 @@ const SignInScreen = () => {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { mutate, isPending, error } = useSignIn();
+  const { mutate, isPending } = useSignIn();
   const [validationErrors, setValidationErrors] = useState<{
     email?: string[];
     password?: string[];
   }>({});
 
   const handleSignIn = () => {
-    const result = signInSchema.safeParse({ email, password });
+    const parse = signInSchema.safeParse({ email, password });
 
-    if (!result.success) {
-      const fieldErrors = z.flattenError(result.error).fieldErrors;
+    if (!parse.success) {
+      const fieldErrors = z.flattenError(parse.error).fieldErrors;
       setValidationErrors(fieldErrors);
       return;
     }
+
     setValidationErrors({});
-    mutate(result.data);
+    mutate(parse.data);
   };
 
   return (
@@ -57,16 +58,28 @@ const SignInScreen = () => {
         </Title>
         <View style={inputsContainer}>
           <TextInput
-            leadingIcon={<Icon name="email-outline" />}
+            leadingIcon="email-outline"
             placeholder={t("signIn.email")}
             onChangeText={setEmail}
+            onChange={() =>
+              setValidationErrors({
+                email: undefined,
+                password: validationErrors.password,
+              })
+            }
             error={validationErrors.email?.[0]}
           />
-          <TextInput
-            leadingIcon={<Icon name="lock-outline" />}
+          <PasswordInput
+            leadingIcon="lock-outline"
+            showTrailingIcon={password.length > 0}
             placeholder={t("signIn.password")}
-            secureTextEntry
             onChangeText={setPassword}
+            onChange={() =>
+              setValidationErrors({
+                email: validationErrors.email,
+                password: undefined,
+              })
+            }
             error={validationErrors.password?.[0]}
           />
         </View>
