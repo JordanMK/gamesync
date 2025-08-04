@@ -1,7 +1,7 @@
 import React from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 
-type MaterialIconName = React.ComponentProps<
+export type MaterialIconName = React.ComponentProps<
   typeof MaterialCommunityIcons
 >["name"];
 
