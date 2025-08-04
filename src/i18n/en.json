@@ -20,23 +20,23 @@
     "confirmPassword": "Confirm password",
     "signUp": "Sign up",
     "hasAccount": "Already have an account?",
-    "signIn": "Sign in"
+    "signIn": "Sign in",
+    "loading": "Loading..."
   },
   "validation": {
     "username": {
-      "required": "Username is required",
-      "exists": "This username already exists"
+      "valid": "Please enter a valid username",
+      "min": "Username must be at least <min> characters"
     },
     "email": {
-      "required": "Email is required",
-      "invalid": "Invalid email"
+      "valid": "Please enter a valid email address"
     },
     "password": {
-      "required": "Password is required",
+      "valid": "Please enter a valid password",
       "min": "Password must be at least <min> characters"
     },
     "confirmPassword": {
-      "required": "Confirm password is required",
+      "confirm": "Please confirm your password",
       "notMatch": "Passwords do not match"
     }
   }

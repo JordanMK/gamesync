@@ -1,5 +1,44 @@
 {
   "welcome": {
-    "title": "Nooit vergeten"
+    "title": "Vergeet\nnooit meer\nje <highlight>games</highlight>"
+  },
+  "signIn": {
+    "title": "Hey,\nWelkom\nterug!",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "forgotPassword": "Wachtwoord vergeten?",
+    "signIn": "Inloggen",
+    "noAccount": "Nog geen account?",
+    "signUp": "Registreren",
+    "loading": "Laden..."
+  },
+  "signUp": {
+    "title": "Laten we\nbeginnen!",
+    "username": "Gebruikersnaam",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "confirmPassword": "Bevestig wachtwoord",
+    "signUp": "Registreren",
+    "hasAccount": "Heb je al een account?",
+    "signIn": "Inloggen",
+    "loading": "Laden..."
+  },
+  "validation": {
+    "username": {
+      "valid": "Voer een geldige gebruikersnaam in",
+      "min": "Gebruikersnaam moet minstens <min> tekens bevatten"
+    },
+    "email": {
+      "valid": "Voer een geldig e-mailadres in"
+    },
+    "password": {
+      "valid": "Voer een geldig wachtwoord in",
+      "min": "Wachtwoord moet minstens <min> tekens bevatten"
+    },
+    "confirmPassword": {
+      "confirm": "Bevestig je wachtwoord",
+      "notMatch": "Wachtwoorden komen niet overeen"
+    }
   }
 }
+
