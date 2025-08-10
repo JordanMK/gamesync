@@ -1,17 +1,31 @@
-import { StyleSheet, Text, View } from "react-native";
-import useAuthStore from "../../stores/authStore";
+import { ScrollView, StyleSheet, View } from "react-native";
+import EventList from "../../components/events/EventList";
+import GameList from "../../components/games/GameList";
 
 const HomeScreen = () => {
-  const signOut = useAuthStore((s) => s.signOut);
-
   return (
-    <View>
-      <Text>Home</Text>
-      <Text onPress={signOut}>Sign out</Text>
-    </View>
+    <ScrollView style={styles.container}>
+      <View style={styles.listContainer}>
+        <EventList title="Latest events" />
+        <GameList title="Latest games" horizontal />
+        <GameList title="Latest games" horizontal />
+        <GameList title="Latest games" horizontal />
+        <GameList title="Latest games" horizontal />
+        <EventList title="Upcoming events" />
+      </View>
+    </ScrollView>
   );
 };
 
 export default HomeScreen;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  listContainer: {
+    gap: 24,
+    paddingBottom: 32,
+  },
+});

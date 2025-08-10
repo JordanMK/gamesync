@@ -4,11 +4,9 @@ import { darkTheme, lightTheme } from "../utils/theme";
 
 export const useAppTheme = () => {
   const systemTheme = useColorScheme();
-  const { theme: themeState } = useThemeStore();
+  const themeState = useThemeStore((state) => state.theme);
 
   const resolvedTheme = themeState === "system" ? systemTheme : themeState;
 
-  const theme = resolvedTheme === "dark" ? darkTheme : lightTheme;
-
-  return theme;
+  return resolvedTheme === "dark" ? darkTheme : lightTheme;
 };

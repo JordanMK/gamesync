@@ -20,7 +20,7 @@ const variantStyles: Record<TitleVariant, TextStyle> = {
   },
   h2: {
     fontFamily: "IBMPlexSans_600SemiBold",
-    fontSize: 24,
+    fontSize: 22,
     lineHeight: 32,
   },
   h3: {
