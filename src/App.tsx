@@ -33,6 +33,7 @@ export default function App() {
     ...DefaultTheme,
     colors: {
       ...DefaultTheme.colors,
+      primary: colors.primary,
       background: colors.background,
       text: colors.text,
       card: colors.card,
