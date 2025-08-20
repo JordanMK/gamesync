@@ -8,6 +8,7 @@ interface TitleProps {
   children: React.ReactNode;
   variant?: TitleVariant;
   style?: TextStyle;
+  numberOfLines?: number;
 }
 
 // Define styles per variant
@@ -34,11 +35,15 @@ export const Title: React.FC<TitleProps> = ({
   children,
   variant = "h1",
   style,
+  numberOfLines,
 }) => {
   const theme = useAppTheme();
 
   return (
-    <Text style={[variantStyles[variant], { color: theme.colors.text }, style]}>
+    <Text
+      style={[variantStyles[variant], { color: theme.colors.text }, style]}
+      numberOfLines={numberOfLines}
+    >
       {children}
     </Text>
   );

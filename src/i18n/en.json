@@ -23,6 +23,15 @@
     "signIn": "Sign in",
     "loading": "Loading..."
   },
+  "home": {
+    "title": "Homes",
+    "latestEvents": "Latest events",
+    "upcomingEvents": "Upcoming events",
+    "topGames": "Top games",
+    "mostAnticipated": "Most anticipated",
+    "comingSoon": "Coming soon",
+    "recentlyReleased": "Recently released"
+  },
   "validation": {
     "username": {
       "valid": "Please enter a valid username",

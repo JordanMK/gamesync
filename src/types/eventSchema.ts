@@ -17,10 +17,8 @@ export const eventSchema = z.object({
     .transform((value) => new Date(value * 1000))
     .optional(),
   timezone: z.string().optional(),
-  games: z.array(z.number()),
+  games: z.array(z.number()).default([]),
 });
-
-export const eventsSchema = z.array(eventSchema);
 
 export type Event = z.infer<typeof eventSchema>;
 

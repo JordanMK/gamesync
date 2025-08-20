@@ -28,11 +28,11 @@ const styles = StyleSheet.create({
   image: {
     height: 146,
     borderRadius: 8,
-    marginBottom: 4,
+    marginBottom: 6,
     backgroundColor: "rgba(255, 255, 255, 0.3)",
   },
   gameName: {
-    height: 12,
+    minHeight: 15,
     borderRadius: 8,
     backgroundColor: "rgba(255, 255, 255, 0.3)",
   },

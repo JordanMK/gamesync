@@ -3,18 +3,20 @@ import Navigation from "./navigation";
 import * as SplashScreen from "expo-splash-screen";
 import { useCustomFonts } from "./hooks/useCustomFonts";
 import { useEffect } from "react";
-import { useAppTheme } from "./hooks/useAppTheme";
-import { DefaultTheme } from "@react-navigation/native";
 import "./i18n";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import useAuthStore from "./stores/authStore";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { useThemeStore } from "./stores/themeStore";
+import { LightTheme, DarkTheme } from "./utils/theme";
 
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 export default function App() {
   const fontsloaded = useCustomFonts();
-  const { colors } = useAppTheme();
+  const theme = useThemeStore((state) => state.theme);
   const restoreToken = useAuthStore((s) => s.restoreToken);
 
   useEffect(() => {
@@ -29,23 +31,15 @@ export default function App() {
 
   if (!fontsloaded) return null;
 
-  const navTheme = {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      primary: colors.primary,
-      background: colors.background,
-      text: colors.text,
-      card: colors.card,
-      border: colors.border,
-    },
-  };
-
   return (
-    <QueryClientProvider client={queryClient}>
-      <SafeAreaProvider>
-        <Navigation theme={navTheme} />
-      </SafeAreaProvider>
-    </QueryClientProvider>
+    <GestureHandlerRootView>
+      <QueryClientProvider client={queryClient}>
+        <SafeAreaProvider>
+          <BottomSheetModalProvider>
+            <Navigation theme={theme === "light" ? LightTheme : DarkTheme} />
+          </BottomSheetModalProvider>
+        </SafeAreaProvider>
+      </QueryClientProvider>
+    </GestureHandlerRootView>
   );
 }

@@ -12,11 +12,45 @@ import HomeScreen from "../screens/main/HomeScreen";
 import { useIsAuthenticated, useIsNotAuthenticated } from "../stores/authStore";
 import Icon from "../components/Icon";
 import ExtendedListScreen from "../screens/main/ExtendedListScreen";
-import { TouchableOpacity } from "react-native";
+import { Platform, TouchableOpacity } from "react-native";
+import DetailsScreen from "../screens/main/DetailsScreen";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
+import ListTab from "../screens/main/lists/ListTab";
+import { MaterialIcons } from "@expo/vector-icons";
+import SearchScreen from "../screens/main/search/SearchScreen";
+import ProfileScreen from "../screens/main/ProfileScreen";
+
+const ListsTabNavigator = createMaterialTopTabNavigator({
+  screenOptions: ({ theme }) => ({
+    tabBarStyle: {
+      backgroundColor: theme.colors.background,
+    },
+  }),
+  screens: {
+    Playing: {
+      screen: ListTab,
+      initialParams: { predefinedName: "Playing" },
+    },
+    Planned: {
+      screen: ListTab,
+      initialParams: { predefinedName: "Planned" },
+    },
+    Played: {
+      screen: ListTab,
+      initialParams: { predefinedName: "Played" },
+    },
+    Dropped: {
+      screen: ListTab,
+      initialParams: { predefinedName: "Dropped" },
+    },
+  },
+});
 
 const MainNavigator = createBottomTabNavigator({
   initialRouteName: "Home",
   screenOptions: ({ theme }) => ({
+    tabBarPosition: Platform.OS === "web" ? "left" : "bottom",
+    tabBarVariant: Platform.OS === "web" ? "material" : "uikit",
     headerStyle: {
       backgroundColor: theme.colors.background,
     },
@@ -24,6 +58,13 @@ const MainNavigator = createBottomTabNavigator({
     tabBarStyle: {
       backgroundColor: theme.colors.card,
       borderTopWidth: 0,
+      borderRightColor:
+        Platform.OS === "web" ? "rgba(0, 0, 0, 0.15)" : "transparent",
+      minWidth: Platform.OS === "web" ? "auto" : undefined,
+    },
+    tabBarShowLabel: Platform.OS !== "web",
+    tabBarIconStyle: {
+      paddingInlineStart: Platform.OS === "web" ? 10 : undefined,
     },
     tabBarActiveTintColor: theme.colors.primary,
     tabBarInactiveTintColor: theme.colors.text,
@@ -36,7 +77,7 @@ const MainNavigator = createBottomTabNavigator({
       />
     ),
     headerLeftContainerStyle: {
-      marginStart: 16,
+      marginStart: Platform.OS === "web" ? 32 : 16,
       marginEnd: 8,
     },
   }),
@@ -50,15 +91,16 @@ const MainNavigator = createBottomTabNavigator({
       },
     },
     Search: {
-      screen: HomeScreen,
+      screen: SearchScreen,
       options: {
+        headerShown: false,
         tabBarIcon: ({ color }) => (
-          <Icon name="map-search-outline" size={24} color={color} />
+          <MaterialIcons name="search" size={24} color={color} />
         ),
       },
     },
     Lists: {
-      screen: HomeScreen,
+      screen: ListsTabNavigator,
       options: {
         tabBarIcon: ({ color }) => (
           <Icon name="format-list-bulleted" size={24} color={color} />
@@ -66,7 +108,7 @@ const MainNavigator = createBottomTabNavigator({
       },
     },
     Profile: {
-      screen: HomeScreen,
+      screen: ProfileScreen,
       options: {
         tabBarIcon: ({ color }) => (
           <Icon name="account-outline" size={24} color={color} />
@@ -89,6 +131,22 @@ const MainNavigator = createBottomTabNavigator({
       }),
       screen: ExtendedListScreen,
     },
+    Details: {
+      screen: DetailsScreen,
+      initialParams: { id: 0 },
+      options: ({ navigation, theme }) => ({
+        headerTitle: "",
+        tabBarButton: () => null,
+        tabBarItemStyle: {
+          display: "none",
+        },
+        headerLeft: () => (
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="chevron-left" size={32} color={theme.colors.text} />
+          </TouchableOpacity>
+        ),
+      }),
+    },
   },
 });
 
@@ -100,9 +158,9 @@ const RootNavigator = createNativeStackNavigator({
         headerShown: false,
       },
       screens: {
-        WelcomeScreen,
-        SignInScreen,
-        SignUpScreen,
+        Welcome: WelcomeScreen,
+        SignIn: SignInScreen,
+        SignUp: SignUpScreen,
       },
     },
     Main: {

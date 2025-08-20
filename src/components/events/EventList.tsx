@@ -1,19 +1,26 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useCallback, useMemo } from "react";
-import useEvents from "../../queries/useEvents";
 import EventCard from "./EventCard";
 import { Title } from "../Title";
 import EventCardSkeleton from "./EventCardSkeleton";
 import { FlashList } from "@shopify/flash-list";
-import { useAppTheme } from "../../hooks/useAppTheme";
 import { Event } from "../../types/eventSchema";
 import { useNavigation } from "@react-navigation/native";
+import { Query } from "../../services/IGDBService";
+import { useEvents } from "../../queries/useEvents";
 
 type Props = {
   title?: string;
+  query: Query;
 };
 
-const EventList = ({ title }: Props) => {
+const EventList = ({ title, query }: Props) => {
   const {
     data,
     error,
@@ -21,29 +28,44 @@ const EventList = ({ title }: Props) => {
     isFetchingNextPage,
     fetchNextPage,
     isLoading,
-  } = useEvents();
+  } = useEvents(query);
   const navigation = useNavigation();
+  const listContainerStyle = useMemo(
+    () =>
+      Platform.OS === "web" ? styles.webListContainer : styles.listContainer,
+    [],
+  );
+
+  const listContentContainerStyle = useMemo(
+    () =>
+      Platform.OS === "web"
+        ? styles.webListContentContainer
+        : styles.listContentContainer,
+    [],
+  );
 
   const events = useMemo(
     () => data?.pages.flatMap((page) => page.data) || [],
     [data],
   );
 
-  const skeletonData = useMemo(() => Array(10).fill({}), []);
-
-  const { colors } = useAppTheme();
-  const seeAllStyle = useMemo(
-    () => ({ color: colors.primary }),
-    [colors.primary],
+  const skeletonData = useMemo(
+    () => Array(Platform.OS === "web" ? 20 : 10).fill({}),
+    [],
   );
-
   const renderEvent = useCallback(
     ({ item }: { item: Event }) => (
       <TouchableOpacity
+        disabled={!item.games.length}
         onPress={() => {
           navigation.navigate("Main", {
             screen: "ExtendedList",
-            params: { title: item.name, gameIds: item.games },
+            params: {
+              title: item.name,
+              query: {
+                where: [`id = (${item.games.join(",")});`],
+              },
+            },
           });
         }}
       >
@@ -61,17 +83,15 @@ const EventList = ({ title }: Props) => {
   );
 
   if (error) return <Text>{error.message}</Text>;
+  if (events.length === 0 && !isLoading) return;
 
   return (
     <View>
       {title && (
-        <View style={styles.listTitleContainer}>
+        <View>
           <Title variant="h2" style={styles.listTitle}>
             {title}
           </Title>
-          <TouchableOpacity>
-            <Text style={seeAllStyle}>See all</Text>
-          </TouchableOpacity>
         </View>
       )}
       {isLoading ? (
@@ -79,8 +99,8 @@ const EventList = ({ title }: Props) => {
           data={skeletonData}
           renderItem={renderSkeleton}
           horizontal
-          style={styles.listContainer}
-          contentContainerStyle={styles.listContentContainer}
+          style={listContainerStyle}
+          contentContainerStyle={listContentContainerStyle}
           snapToAlignment="start"
           snapToInterval={342}
           ItemSeparatorComponent={renderSeparator}
@@ -99,13 +119,18 @@ const EventList = ({ title }: Props) => {
           snapToAlignment="start"
           snapToInterval={342}
           onEndReachedThreshold={0.5}
+          ListEmptyComponent={
+            <View style={styles.listEmptyContainer}>
+              <Text>This list is empty</Text>
+            </View>
+          }
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
               fetchNextPage();
             }
           }}
-          style={styles.listContainer}
-          contentContainerStyle={styles.listContentContainer}
+          style={listContainerStyle}
+          contentContainerStyle={listContentContainerStyle}
           bounces={false}
           ListFooterComponentStyle={styles.listFooter}
           ItemSeparatorComponent={renderSeparator}
@@ -122,8 +147,19 @@ const styles = StyleSheet.create({
   listContainer: {
     marginHorizontal: -16,
   },
+  webListContainer: {
+    marginHorizontal: -64,
+  },
   listContentContainer: {
     paddingHorizontal: 16,
+  },
+  webListContentContainer: {
+    paddingHorizontal: 64,
+  },
+  listEmptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
   },
   listTitle: {
     marginBottom: 12,
@@ -133,10 +169,5 @@ const styles = StyleSheet.create({
   },
   listItemSeparator: {
     width: 12,
-  },
-  listTitleContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
   },
 });

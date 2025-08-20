@@ -1,4 +1,12 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Title } from "../../components/Title";
 import TextInput from "../../components/TextInput";
@@ -11,14 +19,15 @@ import { useState } from "react";
 import { signInSchema } from "../../types/authSchema";
 import z from "zod";
 import PasswordInput from "../../components/PasswordInput";
+import { getAxiosErrorMessage } from "../../utils/ErrorMessage";
 
 const SignInScreen = () => {
   const { colors } = useAppTheme();
   const navigation = useNavigation();
   const {
     container,
+    webContainer,
     inputsContainer,
-    forgotPassword,
     button,
     noAccountContainer,
     signUp,
@@ -26,11 +35,15 @@ const SignInScreen = () => {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { mutate, isPending } = useSignIn();
+  const { mutate, isPending, error } = useSignIn();
   const [validationErrors, setValidationErrors] = useState<{
     email?: string[];
     password?: string[];
   }>({});
+  const containerStyle: StyleProp<ViewStyle> =
+    Platform.OS === "web"
+      ? [webContainer, { backgroundColor: colors.card }]
+      : container;
 
   const handleSignIn = () => {
     const parse = signInSchema.safeParse({ email, password });
@@ -46,7 +59,7 @@ const SignInScreen = () => {
   };
 
   return (
-    <SafeAreaView style={container}>
+    <SafeAreaView style={containerStyle}>
       <View>
         <Title>
           <Trans
@@ -83,11 +96,9 @@ const SignInScreen = () => {
             error={validationErrors.password?.[0]}
           />
         </View>
-        <TouchableOpacity>
-          <Text style={[forgotPassword, { color: colors.text }]}>
-            {t("signIn.forgotPassword")}
-          </Text>
-        </TouchableOpacity>
+        {error && (
+          <Text style={styles.error}>{getAxiosErrorMessage(error)}</Text>
+        )}
         <Button
           label={isPending ? t("signIn.loading") : t("signIn.signIn")}
           containerStyle={button}
@@ -96,7 +107,7 @@ const SignInScreen = () => {
 
         <View style={noAccountContainer}>
           <Text style={{ color: colors.text }}>{t("signIn.noAccount")}</Text>
-          <TouchableOpacity onPress={() => navigation.navigate("SignUpScreen")}>
+          <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
             <Text style={[signUp, { color: colors.primary }]}>
               {t("signIn.signUp")}
             </Text>
@@ -116,6 +127,18 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginVertical: "12%",
   },
+  webContainer: {
+    flex: 1,
+    padding: 32,
+    paddingHorizontal: 72,
+    marginVertical: "2%",
+    justifyContent: "center",
+    alignSelf: "center",
+    width: 480,
+    borderColor: "rgba(0, 0, 0, 0.2)",
+    borderWidth: 1,
+    borderRadius: 12,
+  },
   inputsContainer: {
     marginTop: 46,
     gap: 30,
@@ -127,6 +150,11 @@ const styles = StyleSheet.create({
   },
   button: {
     marginTop: 30,
+  },
+  error: {
+    color: "red",
+    paddingTop: 16,
+    textAlign: "center",
   },
   noAccountContainer: {
     marginTop: 20,

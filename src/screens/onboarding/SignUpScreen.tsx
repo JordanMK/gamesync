@@ -1,4 +1,12 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Platform,
+  StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  ViewStyle,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Title } from "../../components/Title";
 import TextInput from "../../components/TextInput";
@@ -15,8 +23,14 @@ import PasswordInput from "../../components/PasswordInput";
 const SignUpScreen = () => {
   const { colors } = useAppTheme();
   const navigation = useNavigation();
-  const { container, inputsContainer, button, hasAccountContainer, signIn } =
-    styles;
+  const {
+    container,
+    webContainer,
+    inputsContainer,
+    button,
+    hasAccountContainer,
+    signIn,
+  } = styles;
   const { t } = useTranslation();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -29,6 +43,10 @@ const SignUpScreen = () => {
     confirmPassword?: string[];
   }>({});
   const { mutate, isPending, error } = useSignUp();
+  const containerStyle: StyleProp<ViewStyle> =
+    Platform.OS === "web"
+      ? [webContainer, { backgroundColor: colors.card }]
+      : container;
 
   const handleSignUp = () => {
     const parse = signUpSchema.safeParse({
@@ -48,14 +66,14 @@ const SignUpScreen = () => {
     mutate(parse.data);
 
     if (!error) {
-      navigation.navigate("SignInScreen");
+      navigation.navigate("SignIn");
     } else {
       console.warn(error);
     }
   };
 
   return (
-    <SafeAreaView style={container}>
+    <SafeAreaView style={containerStyle}>
       <View>
         <Title>
           <Trans
@@ -152,6 +170,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     justifyContent: "space-between",
     marginVertical: "12%",
+  },
+  webContainer: {
+    flex: 1,
+    padding: 32,
+    paddingHorizontal: 72,
+    marginVertical: "2%",
+    justifyContent: "center",
+    alignSelf: "center",
+    width: 480,
+    borderColor: "rgba(0, 0, 0, 0.2)",
+    borderWidth: 1,
+    borderRadius: 12,
   },
   inputsContainer: {
     marginTop: 46,

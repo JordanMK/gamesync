@@ -1,4 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  Image,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Title } from "../../components/Title";
 import { useAppTheme } from "../../hooks/useAppTheme";
@@ -9,10 +16,20 @@ import { Trans } from "react-i18next";
 const WelcomeScreen = () => {
   const { colors } = useAppTheme();
   const navigation = useNavigation();
-  const { container, image, bottom, dotRow, dot, lastDot, button } = styles;
+  const {
+    container,
+    webContainer,
+    image,
+    bottom,
+    dotRow,
+    dot,
+    lastDot,
+    button,
+  } = styles;
+  const containerStyle = Platform.OS === "web" ? webContainer : container;
 
   return (
-    <SafeAreaView style={container}>
+    <SafeAreaView style={containerStyle}>
       <View>
         <Title>
           <Trans
@@ -36,7 +53,7 @@ const WelcomeScreen = () => {
         </View>
         <TouchableOpacity
           style={[button, { backgroundColor: colors.primary }]}
-          onPress={() => navigation.navigate("SignInScreen")}
+          onPress={() => navigation.navigate("SignIn")}
         >
           <Icon name="chevron-right" size={32} color={colors.text} />
         </TouchableOpacity>
@@ -53,6 +70,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     justifyContent: "space-between",
     marginVertical: "12%",
+  },
+  webContainer: {
+    flex: 1,
+    paddingHorizontal: "30%",
+    marginVertical: "4%",
+    justifyContent: "space-between",
   },
   image: {
     alignSelf: "center",

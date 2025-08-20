@@ -3,7 +3,7 @@ import gameSyncService from "../services/gameSyncService";
 import useAuthStore from "../stores/authStore";
 import { SignIn, SignUp } from "../types/authSchema";
 
-const useSignIn = () => {
+export const useSignIn = () => {
   const authStore = useAuthStore();
 
   return useMutation({
@@ -14,10 +14,8 @@ const useSignIn = () => {
   });
 };
 
-const useSignUp = () => {
+export const useSignUp = () => {
   return useMutation({
     mutationFn: (data: SignUp) => gameSyncService.signUp(data),
   });
 };
-
-export { useSignIn, useSignUp };

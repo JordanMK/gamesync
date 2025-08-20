@@ -1,28 +1,19 @@
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useCallback, useMemo } from "react";
-import { Title } from "../Title";
+import SearchGameCard from "./SearchGameCard";
+import { Query } from "../../services/IGDBService";
 import { useGames } from "../../queries/useGames";
-import GameCard from "./GameCard";
-import GameCardSkeleton from "./GameCardSkeleton";
-import { FlashList } from "@shopify/flash-list";
+import { useNavigation } from "@react-navigation/native";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { Game } from "../../types/gameSchema";
-import { useNavigation } from "@react-navigation/native";
-import { Query } from "../../services/IGDBService";
+import GameCardSkeleton from "../games/GameCardSkeleton";
+import { FlashList } from "@shopify/flash-list";
 
 type Props = {
-  title?: string;
-  horizontal?: boolean;
   query: Query;
 };
 
-const GameList = ({ title, horizontal, query }: Props) => {
+const SearchList = ({ query }: Props) => {
   const {
     data,
     error,
@@ -47,11 +38,6 @@ const GameList = ({ title, horizontal, query }: Props) => {
     [],
   );
 
-  const seeAllStyle = useMemo(
-    () => ({ color: colors.primary }),
-    [colors.primary],
-  );
-
   const games = useMemo(
     () => data?.pages.flatMap((page) => page.data) || [],
     [data],
@@ -63,7 +49,7 @@ const GameList = ({ title, horizontal, query }: Props) => {
   );
 
   const renderGame = useCallback(
-    ({ item }: { item: Game }) => <GameCard game={item} />,
+    ({ item }: { item: Game }) => <SearchGameCard game={item} />,
     [],
   );
   const renderSkeleton = useCallback(() => <GameCardSkeleton />, []);
@@ -72,44 +58,10 @@ const GameList = ({ title, horizontal, query }: Props) => {
     [],
   );
 
-  const listLayoutProps = useMemo(() => {
-    if (horizontal) {
-      return {
-        horizontal: true,
-        snapToAlignment: "start" as const,
-        snapToInterval: 104,
-      } as const;
-    } else {
-      return {
-        numColumns: Platform.OS === "web" ? 9 : 3,
-      } as const;
-    }
-  }, [horizontal]);
-
-  const navigateToExtendedList = (title: string) =>
-    navigation.navigate("Main", {
-      screen: "ExtendedList",
-      params: { title, query },
-    });
-
   if (error) return <Text>{error.message}</Text>;
-  if (games.length === 0 && !isLoading) return;
 
   return (
     <View style={styles.container}>
-      {title && (
-        <View style={styles.listTitleContainer}>
-          <Title variant="h2" style={styles.listTitle}>
-            {title}
-          </Title>
-          {(Platform.OS !== "web" || !horizontal) && (
-            <TouchableOpacity onPress={() => navigateToExtendedList(title)}>
-              <Text style={seeAllStyle}>See all</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
-
       {isLoading ? (
         <FlashList
           data={skeletonData}
@@ -117,17 +69,15 @@ const GameList = ({ title, horizontal, query }: Props) => {
           style={listContainerStyle}
           contentContainerStyle={[
             listContentContainerStyle,
-            !horizontal &&
-              (Platform.OS === "web"
-                ? styles.webListVerticalPadding
-                : styles.listVerticalPadding),
+            Platform.OS === "web"
+              ? styles.webListContentContainer
+              : styles.listContentContainer,
           ]}
           ListFooterComponentStyle={styles.listFooter}
           ItemSeparatorComponent={renderSeparator}
           showsHorizontalScrollIndicator={false}
           bounces={false}
           showsVerticalScrollIndicator={false}
-          {...listLayoutProps}
         />
       ) : (
         <FlashList
@@ -141,33 +91,26 @@ const GameList = ({ title, horizontal, query }: Props) => {
           ListFooterComponentStyle={styles.listFooter}
           ItemSeparatorComponent={renderSeparator}
           showsHorizontalScrollIndicator={false}
-          onEndReachedThreshold={horizontal ? 0.5 : 0.1}
-          ListEmptyComponent={
-            <View style={styles.listEmptyContainer}>
-              <Text>This list is empty</Text>
-            </View>
-          }
+          onEndReachedThreshold={0.1}
           bounces={false}
           contentContainerStyle={[
             listContentContainerStyle,
-            !horizontal &&
-              (Platform.OS === "web"
-                ? styles.webListVerticalPadding
-                : styles.listVerticalPadding),
+            Platform.OS === "web"
+              ? styles.webListContentContainer
+              : styles.listContentContainer,
           ]}
           onEndReached={() => {
             if (hasNextPage && !isFetchingNextPage) {
               fetchNextPage();
             }
           }}
-          {...listLayoutProps}
         />
       )}
     </View>
   );
 };
 
-export default GameList;
+export default SearchList;
 
 const styles = StyleSheet.create({
   container: {
@@ -175,30 +118,19 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     marginHorizontal: -16,
-    flex: 1,
   },
   webListContainer: {
     marginHorizontal: -64,
-    flex: 1,
   },
   listContentContainer: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 62,
   },
   webListContentContainer: {
-    paddingHorizontal: 64,
-  },
-  listVerticalPadding: {
-    paddingHorizontal: 20,
-    paddingBottom: 32,
-  },
-  webListVerticalPadding: {
     paddingHorizontal: 32,
+    paddingTop: 16,
     paddingBottom: 64,
-  },
-  listEmptyContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
   listTitle: {
     marginBottom: 12,

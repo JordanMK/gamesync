@@ -1,83 +1,77 @@
-import axios from "axios";
-import { Game, gamesSchema } from "../types/gameSchema";
-import { Event, eventsSchema, Page } from "../types/eventSchema";
-import camelcaseKeys from "camelcase-keys";
-import { QueryFunctionContext } from "@tanstack/react-query";
+import {
+  Game,
+  GameDetails,
+  gameDetailsSchema,
+  gameSchema,
+} from "../types/gameSchema";
+import { Event, eventSchema, Page } from "../types/eventSchema";
+import { igdbClient } from "./clients/igdbClient";
+import { Platform } from "react-native";
 
-const igdbApi = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_IGDB_API_URL,
-  headers: {
-    Authorization: `Bearer ${process.env.EXPO_PUBLIC_IGDB_API_ACCESS_TOKEN}`,
-    "Client-ID": process.env.EXPO_PUBLIC_IGDB_API_CLIENT_ID,
-    "Content-Type": "text/plain",
-  },
-  responseType: "json",
-});
+const gameFields = "*, cover.url, genres.name";
+const eventFields = "*, event_logo.url, games";
+const limit = Platform.OS === "web" ? 20 : 10;
 
-igdbApi.interceptors.response.use(
-  (response) => {
-    if (
-      response.headers["content-type"]?.includes("application/json") &&
-      typeof response.data === "object"
-    ) {
-      response.data = camelcaseKeys(response.data, { deep: true });
-    }
-    return response;
-  },
-  (error) => {
-    return Promise.reject(error);
-  },
-);
-
-export const getLatestEvents = async ({
-  pageParam = 0,
-}: QueryFunctionContext<string[], number>): Promise<Page<Event[]>> => {
-  const now = Math.floor(Date.now() / 1000);
-
-  const limit = 10;
-  const query = `
-    fields *, event_logo.url, games;
-    sort start_time desc;
-    where start_time < ${now};
-    limit ${limit};
-    offset ${pageParam};
-  `;
-
-  const response = await igdbApi.post("/events", query);
-  const parsed = eventsSchema.safeParse(response.data);
-
-  if (!parsed.success) {
-    throw new Error(parsed.error.message);
-  }
-
-  return {
-    data: parsed.data,
-    nextOffset: response.data.length === limit ? pageParam + limit : null,
+export interface Query {
+  where?: string[];
+  fields?: string;
+  exclude?: string;
+  sort?: {
+    field: string;
+    order: "asc" | "desc";
   };
-};
+  limit?: string;
+  offset?: string;
+  search?: string;
+}
 
-type QueryWithIds = {
-  ids: number[];
+type PagedQuery = {
+  query: Query;
   pageParam?: number;
 };
 
-export const getGamesByIds = async ({
-  pageParam = 0,
-  ids,
-}: QueryWithIds): Promise<Page<Game[]>> => {
-  const limit = 10;
-  let query = `
-    fields *, cover.url;
-    limit ${limit};
-    offset ${pageParam};
-  `;
+export const getGameById = async (id: number): Promise<GameDetails> => {
+  const response = await igdbClient
+    .fields(
+      "*, cover.url, genres.name, platforms.alternative_name, platforms.name, screenshots.url",
+    )
+    .where(`id = ${id}`)
+    .request(`/games`);
 
-  if (ids.length > 0) {
-    query += `where id = (${ids.join(",")});`;
+  const parsed = gameDetailsSchema.array().safeParse(response.data);
+
+  if (!parsed.success) {
+    throw new Error(parsed.error.message);
   }
 
-  const response = await igdbApi.post("/games", query);
-  const parsed = gamesSchema.safeParse(response.data);
+  return parsed.data[0];
+};
+
+export const getGames = async ({
+  query,
+  pageParam = 0,
+}: PagedQuery): Promise<Page<Game[]>> => {
+  const client = igdbClient;
+
+  if (query.where) {
+    client.where(query.where);
+  }
+
+  if (query.sort) {
+    client.sort(query.sort.field, query.sort.order);
+  }
+
+  if (query.search) {
+    client.search(query.search);
+  }
+
+  const response = await client
+    .fields(query.fields || gameFields)
+    .limit(limit)
+    .offset(pageParam)
+    .request("/games");
+
+  const parsed = gameSchema.array().safeParse(response.data);
 
   if (!parsed.success) {
     throw new Error(parsed.error.message);
@@ -89,18 +83,31 @@ export const getGamesByIds = async ({
   };
 };
 
-export const getGames = async ({
+export const getEvents = async ({
+  query,
   pageParam = 0,
-}: QueryFunctionContext<string[], number>): Promise<Page<Game[]>> => {
-  const limit = 10;
-  const query = `
-    fields *, cover.url;
-    limit ${limit};
-    offset ${pageParam};
-  `;
+}: PagedQuery): Promise<Page<Event[]>> => {
+  const client = igdbClient;
 
-  const response = await igdbApi.post("/games", query);
-  const parsed = gamesSchema.safeParse(response.data);
+  if (query.where) {
+    client.where(query.where);
+  }
+
+  if (query.sort) {
+    client.sort(query.sort.field, query.sort.order);
+  }
+
+  if (query.search) {
+    client.search(query.search);
+  }
+
+  const response = await client
+    .fields(eventFields)
+    .limit(limit)
+    .offset(pageParam)
+    .request("/events");
+
+  const parsed = eventSchema.array().safeParse(response.data);
 
   if (!parsed.success) {
     throw new Error(parsed.error.message);

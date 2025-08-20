@@ -27,6 +27,8 @@ const useAuthStore = create<AuthStore>((set) => ({
     const token = await getToken();
     if (token) {
       set({ token, isAuthenticated: true });
+    } else {
+      set({ token: null, isAuthenticated: false });
     }
   },
 }));
